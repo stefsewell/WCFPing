@@ -20,13 +20,11 @@ namespace TestClient {
 
             asyncTask.ContinueWith(task =>
             {
-                Console.WriteLine("Tests complete, press any key to exit.");
-            });
-            
-            var asyncTask2 = CallWcfServiceUsingGenericProxy2Async();
+                var asyncTask2 = CallWcfServiceUsingGenericProxy2Async();
 
-            asyncTask2.ContinueWith(task => {
-                Console.WriteLine("Tests complete, press any key to exit.");
+                asyncTask2.ContinueWith(task2 => {
+                    Console.WriteLine("Tests complete, press any key to exit.");
+                });
             });
 
             Console.ReadKey();
