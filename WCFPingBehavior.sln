@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25123.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestService", "TestService\TestService.csproj", "{1BF50D88-DB89-4B08-BD9A-29A5D6189A65}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCFBehaviors", "WCFBehaviors\WCFBehaviors.csproj", "{8B037F5D-14F1-4ACE-A89A-B63359C7993F}"
@@ -13,24 +15,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWFService", "TestWFService\TestWFService.csproj", "{EAED8198-7A46-4CFD-89A0-600BF09236BE}"
 EndProject
 Global
-	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 5
-		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
-		SccTeamFoundationServer = http://tfs.ap.aderant.com:8080/
-		SccLocalPath0 = .
-		SccProjectUniqueName1 = TestClient\\TestClient.csproj
-		SccProjectName1 = TestClient
-		SccLocalPath1 = TestClient
-		SccProjectUniqueName2 = TestService\\TestService.csproj
-		SccProjectName2 = TestService
-		SccLocalPath2 = TestService
-		SccProjectUniqueName3 = TestWFService\\TestWFService.csproj
-		SccProjectName3 = TestWFService
-		SccLocalPath3 = TestWFService
-		SccProjectUniqueName4 = WCFBehaviors\\WCFBehaviors.csproj
-		SccProjectName4 = WCFBehaviors
-		SccLocalPath4 = WCFBehaviors
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Debug|Mixed Platforms = Debug|Mixed Platforms

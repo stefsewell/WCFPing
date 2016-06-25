@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Linq;
 using System.Net;
-using System.Threading;
+using System.ServiceModel;
+using System.Threading.Tasks;
 using System.Xml.Linq;
 
 using TestClient.TestService;
@@ -11,13 +12,50 @@ namespace TestClient {
         static void Main() {
             CallServiceUsingGeneratedProxy();
 
-            Thread.Sleep(1000);
             CallWcfServiceUsingGenericProxy();
 
-            Thread.Sleep(1000);
             CallWorkflowServiceUsingGenericProxy();
 
+            var asyncTask = CallWcfServiceUsingGenericProxyAsync();
+
+            asyncTask.ContinueWith(task =>
+            {
+                Console.WriteLine("Tests complete, press any key to exit.");
+            });
+            
+            var asyncTask2 = CallWcfServiceUsingGenericProxy2Async();
+
+            asyncTask2.ContinueWith(task => {
+                Console.WriteLine("Tests complete, press any key to exit.");
+            });
+
             Console.ReadKey();
+        }
+
+        private static async Task CallWcfServiceUsingGenericProxyAsync() {
+            const string address = @"http://localhost/TestService/Service1.svc";
+            const string serviceContractType = "IService1";
+            const string serviceContractNamespace = @"http://aderant.com/expert/contract/TestServiceContract";
+
+            Console.WriteLine("Pinging WCF service using the string-based common proxy asynchronously...");
+            DateTime utcStart = DateTime.UtcNow;
+            var response = await PingServiceAsync(serviceContractType, serviceContractNamespace, address);
+            DateTime utcFinished = DateTime.UtcNow;
+
+            DateTime serverPingTimeUtc = ProcessPingResponse(response, serviceContractNamespace);
+            WriteTimingMessage(utcStart, serverPingTimeUtc, utcFinished);
+        }
+
+        private static async Task CallWcfServiceUsingGenericProxy2Async() {
+            const string address = @"http://localhost/TestService/Service1.svc";
+            
+            Console.WriteLine("Pinging WCF service using the generic common proxy asynchronously...");
+            DateTime utcStart = DateTime.UtcNow;
+            var response = await PingServiceAsync<IService1>(address);
+            DateTime utcFinished = DateTime.UtcNow;
+
+            DateTime serverPingTimeUtc = ProcessPingResponse(response, GetContractNamespace<IService1>());
+            WriteTimingMessage(utcStart, serverPingTimeUtc, utcFinished);
         }
 
         private static void CallWorkflowServiceUsingGenericProxy() {
@@ -25,6 +63,7 @@ namespace TestClient {
             const string serviceContractType = "IFooService";
             const string serviceContractNamespace = @"http://tempuri.org/";
 
+            Console.WriteLine("Pinging workflow service using the generic proxy...");
             DateTime utcStart = DateTime.UtcNow;
             string response = PingService(serviceContractType, serviceContractNamespace, address);
             DateTime utcFinished = DateTime.UtcNow;
@@ -66,22 +105,58 @@ namespace TestClient {
         }
 
         private static string PingService(string serviceContractType, string contractNamespace, string address) {
-            string pingSoapMessage = string.Format(@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body><Ping xmlns=""{0}""/></s:Body></s:Envelope>", contractNamespace);
+            string pingSoapMessage =
+                $@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body><Ping xmlns=""{contractNamespace}""/></s:Body></s:Envelope>";
 
             if (!contractNamespace.EndsWith("/")) { contractNamespace = contractNamespace + "/";}
             
             WebClient pingClient = new WebClient();
             pingClient.Headers.Add("Content-Type", "text/xml; charset=utf-8");
-            pingClient.Headers.Add("SOAPAction", string.Format(@"""{0}{1}/Ping""", contractNamespace, serviceContractType));
+            pingClient.Headers.Add("SOAPAction", $@"""{contractNamespace}{serviceContractType}/Ping""");
             string response = pingClient.UploadString(address, pingSoapMessage);
             return response;
         }
+
+        private static Task<string> PingServiceAsync(string serviceContractType, string contractNamespace, string address) {
+            string pingSoapMessage =
+                $@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body><Ping xmlns=""{contractNamespace}""/></s:Body></s:Envelope>";
+
+            if (!contractNamespace.EndsWith("/")) { contractNamespace = contractNamespace + "/"; }
+
+            WebClient pingClient = new WebClient();
+            pingClient.Headers.Add("Content-Type", "text/xml; charset=utf-8");
+            pingClient.Headers.Add("SOAPAction", $@"""{contractNamespace}{serviceContractType}/Ping""");
+            return pingClient.UploadStringTaskAsync(address, pingSoapMessage);
+        }
+
+        private static Task<string> PingServiceAsync<TServiceContract>(string address)
+        {
+            string contractNamespace = GetContractNamespace<TServiceContract>();
+
+            string pingSoapMessage =
+                $@"<s:Envelope xmlns:s=""http://schemas.xmlsoap.org/soap/envelope/""><s:Body><Ping xmlns=""{contractNamespace}""/></s:Body></s:Envelope>";
+
+            if (!contractNamespace.EndsWith("/")) { contractNamespace = contractNamespace + "/"; }
+            
+            WebClient pingClient = new WebClient();
+            pingClient.Headers.Add("Content-Type", "text/xml; charset=utf-8");
+            pingClient.Headers.Add("SOAPAction", $@"""{contractNamespace}{typeof(TServiceContract).Name}/Ping""");
+            return pingClient.UploadStringTaskAsync(address, pingSoapMessage);
+        }
+
 
         private static void WriteTimingMessage(DateTime utcStart, DateTime pingedAt, DateTime utcFinished) {
             Console.WriteLine("Completed at {0}, service contacted at {1}, time taken: {2} ms.",
                               utcFinished.ToLongTimeString(),
                               pingedAt.ToLongTimeString(),
                               utcFinished.Subtract(utcStart).Milliseconds);
+        }
+
+        private static string GetContractNamespace<TServiceContract>()
+        {
+            return (
+                (ServiceContractAttribute)typeof(TServiceContract).GetCustomAttributes(typeof(ServiceContractAttribute), true).Single()
+                ).Namespace;
         }
     }
 }
