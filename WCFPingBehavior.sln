@@ -16,7 +16,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestWFService", "TestWFServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WCFClientUtilities", "WCFClientUtilities\WCFClientUtilities.csproj", "{4F58037D-8F24-4774-AEB5-C9C2BF793B7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.WcfClientUltilities", "UnitTests.WcfClientUltilities\UnitTests.WcfClientUltilities.csproj", "{E9BEBA57-9465-4527-A8DA-39E89AE0E3DD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTests.WcfClientUtilities", "UnitTests.WcfClientUltilities\UnitTests.WcfClientUtilities.csproj", "{E9BEBA57-9465-4527-A8DA-39E89AE0E3DD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
